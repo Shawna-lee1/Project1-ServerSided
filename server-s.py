@@ -1,17 +1,24 @@
-import socket
-import sys
-import signal
-import time
+import socket #Enables network operations like creating a server
+import sys #Provides access to some variables used by the interpreter like command-line arguments
+import signal #Allows you to handle asynchronous events or signals.
+import time #provide various time-related functions.
+
+
+
 
 ### Step 1: Command Line Processing and Signal Handling
 
-not_stopped = True
+not_stopped = True #This global variable acts as a flag to control the main server loop.
 
-def signal_handler(sig, frame):
+#This function is designed to handle signals by changing not_stopped to False and printing a message. 
+#It will be triggered by signal events like keyboard interrupts (Ctrl+C).
+def signal_handler(sig, frame): 
     global not_stopped
     not_stopped = False
     print(f"\nServer shutting down... Signal: {sig}, Frame: {frame}")
 
+#This function continuously reads data from a client socket until it encounters a carriage return and newline ("\r\n").
+#If socket reading times out, it handles the exception and closes the socket.
 def receive_commands(client_socket):
     b = b""
 
@@ -28,6 +35,7 @@ def receive_commands(client_socket):
 
         b = b + chunk
 
+#receives data from the client socket and accumulates the total number of bytes received.
 def handle_client_connection(client_socket):
     total_bytes_received = 0
     while True:
@@ -41,6 +49,7 @@ def handle_client_connection(client_socket):
 
 ### Step 2: Server Socket Initialization and Connection Accepting
 
+#This function creates, binds, and returns a server socket listening on all available interfaces (0.0.0.0) and a specified port.
 def create_server_socket(port):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind(('0.0.0.0', port))
