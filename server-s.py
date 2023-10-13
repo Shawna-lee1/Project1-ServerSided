@@ -12,6 +12,21 @@ def signal_handler(sig, frame):
     not_stopped = False
     print(f"\nServer shutting down... Signal: {sig}, Frame: {frame}")
 
+def receive_commands(client_socket):
+    b = b""
+
+    while True:
+        # Breaks loop once complete data is received
+        if b.endswith(b"\r\n"):
+            break
+        try:
+            chunk = client_socket.recv(1024)
+        except socket.timeout:
+            sys.stderr.write("ERROR: Timeout waiting for commands from the server.\n")
+            client_socket.close()
+            sys.exit(1)
+
+        b = b + chunk
 
 def handle_client_connection(client_socket):
     total_bytes_received = 0
@@ -45,6 +60,9 @@ def main():
 
     try:
         PORT = int(sys.argv[1])
+        if not 0 <= PORT <= 65535:
+            sys.stderr.write("ERROR: Invalid port range\n")
+            sys.exit(1)
     except ValueError:
         sys.stderr.write("ERROR: Invalid port number\n")
         sys.exit(1)
@@ -67,6 +85,12 @@ def main():
             print(f"Connection from {client_address}...")
             
             client_socket.send(b"accio\r\n")
+
+            receive_commands(client_socket)
+
+            client_socket.send(b"confirm-accio-again\r\n\r\n")
+
+            receive_commands(client_socket)
             
             handle_client_connection(client_socket)
             
