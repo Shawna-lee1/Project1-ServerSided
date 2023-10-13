@@ -31,7 +31,7 @@ def receive_commands(client_socket):
         except socket.timeout:
             sys.stderr.write("ERROR: Timeout waiting for commands from the server.\n")
             client_socket.close()
-            #sys.exit(1)
+            sys.exit(1)
 
         b = b + chunk
 
