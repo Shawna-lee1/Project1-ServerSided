@@ -22,7 +22,10 @@ def main():
         sys.exit(1)
 
     try:
-        port = int(sys.argv[1])
+        PORT = int(sys.argv[1])
+        if not 0 <= PORT <= 65535:
+            sys.stderr.write("ERROR: Invalid port range\n")
+            sys.exit(1)
     except ValueError:
         sys.stderr.write("ERROR: Invalid port number\n")
         sys.exit(1)
